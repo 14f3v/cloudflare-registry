@@ -3,6 +3,7 @@ import { RegistryStorage } from './storage';
 import { RegistryError, formatError } from './utils';
 import { calculateDigest } from './digest';
 import { authMiddleware, dbMiddleware, requirePermission } from './auth/middleware';
+import { JWT } from './auth/jwt';
 import { Env } from './types';
 
 export const createRegistry = (env: Env) => {
@@ -22,9 +23,47 @@ export const createRegistry = (env: Env) => {
         return c.json(formatError('INTERNAL_ERROR', 'Internal Server Error'), 500);
     });
 
-    // 1. Base Check (no auth required)
-    app.get('/v2/', (c) => {
+    // 1. Base Check - validates credentials if provided
+    app.get('/v2/', async (c) => {
         c.header('Docker-Distribution-Api-Version', 'registry/2.0');
+
+        // If Authorization header is present, validate it
+        const authHeader = c.req.header('authorization');
+        if (authHeader) {
+            const db = c.get('db');
+            const jwt = new JWT(c.env.JWT_SECRET);
+
+            let token: string | null = null;
+
+            // Extract token from Bearer or Basic auth
+            if (authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            } else if (authHeader.startsWith('Basic ')) {
+                const base64 = authHeader.substring(6);
+                const decoded = atob(base64);
+                const [_, password] = decoded.split(':', 2);
+                token = password;
+            }
+
+            if (token) {
+                // Check if it's a PAT
+                if (token.startsWith('cfr_')) {
+                    const patValidation = await db.validatePAT(token);
+                    if (!patValidation) {
+                        c.header('WWW-Authenticate', 'Basic realm="Docker Registry"');
+                        return c.json({ error: 'Invalid or expired token' }, 401);
+                    }
+                } else {
+                    // Validate as JWT session token
+                    const payload = await jwt.verify(token);
+                    if (!payload) {
+                        c.header('WWW-Authenticate', 'Basic realm="Docker Registry"');
+                        return c.json({ error: 'Invalid or expired token' }, 401);
+                    }
+                }
+            }
+        }
+
         return c.json({});
     });
 

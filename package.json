@@ -1,5 +1,13 @@
 {
   "name": "cloudflare-registry",
+  "version": "1.0.0",
+  "description": "A Docker Registry v2 implementation running on Cloudflare Workers with OAuth authentication",
+  "license": "MIT",
+  "author": "Phimasone Labs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/cloudflare-registry"
+  },
   "module": "index.ts",
   "type": "module",
   "private": true,
