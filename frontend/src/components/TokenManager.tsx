@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { CopyButton } from './CopyButton';
 
 interface Token {
     id: string;
@@ -87,12 +88,6 @@ export function TokenManager() {
         }
     };
 
-    const copyToken = () => {
-        if (generatedToken) {
-            navigator.clipboard.writeText(generatedToken);
-        }
-    };
-
     const formatDate = (timestamp: number | null) => {
         if (!timestamp) return 'Never';
         return new Date(timestamp).toLocaleDateString();
@@ -177,7 +172,7 @@ export function TokenManager() {
                                 <p className="warning-text">⚠️ Copy this token now. It will never be shown again.</p>
                                 <div className="token-display">
                                     <code>{generatedToken}</code>
-                                    <button className="copy-btn" onClick={copyToken}>📋 Copy</button>
+                                    <CopyButton text={generatedToken} />
                                 </div>
                                 <button
                                     className="btn-primary"

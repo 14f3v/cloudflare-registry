@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { LoginModal } from './components/LoginModal'
 import { UserMenu } from './components/UserMenu'
 import { SettingsLayout } from './components/SettingsLayout'
+import { CopyButton } from './components/CopyButton'
 import './App.css'
 
 interface Repository {
@@ -19,7 +20,6 @@ function AppContent() {
     const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
 
     useEffect(() => {
         if (activeTab === 'browse') {
@@ -53,16 +53,6 @@ function AppContent() {
             setError(err instanceof Error ? err.message : 'Failed to load repositories')
         } finally {
             setLoading(false)
-        }
-    }
-
-    const copyToClipboard = async (text: string, id: string) => {
-        try {
-            await navigator.clipboard.writeText(text)
-            setCopiedCommand(id)
-            setTimeout(() => setCopiedCommand(null), 2000)
-        } catch (err) {
-            console.error('Failed to copy:', err)
         }
     }
 
@@ -159,39 +149,24 @@ function AppContent() {
                             <div className="command-group">
                                 <div className="command-item">
                                     <div className="command-label">1. Login to Registry</div>
-                                    <div className="command-box">
+                                    <div className="cmd-block">
                                         <code>docker login {window.location.host}</code>
-                                        <button
-                                            className="copy-btn"
-                                            onClick={() => copyToClipboard(`docker login ${window.location.host}`, 'cmd0')}
-                                        >
-                                            {copiedCommand === 'cmd0' ? '✓' : '📋'}
-                                        </button>
+                                        <CopyButton text={`docker login ${window.location.host}`} className="copy-btn-small" />
                                     </div>
                                     <p className="hint-text">Use your OAuth token as the password</p>
                                 </div>
                                 <div className="command-item">
                                     <div className="command-label">2. Tag your image</div>
-                                    <div className="command-box">
+                                    <div className="cmd-block">
                                         <code>docker tag myimage:latest {window.location.host}/myimage:latest</code>
-                                        <button
-                                            className="copy-btn"
-                                            onClick={() => copyToClipboard(`docker tag myimage:latest ${window.location.host}/myimage:latest`, 'cmd1')}
-                                        >
-                                            {copiedCommand === 'cmd1' ? '✓' : '📋'}
-                                        </button>
+                                        <CopyButton text={`docker tag myimage:latest ${window.location.host}/myimage:latest`} className="copy-btn-small" />
                                     </div>
                                 </div>
                                 <div className="command-item">
                                     <div className="command-label">3. Push to registry</div>
-                                    <div className="command-box">
+                                    <div className="cmd-block">
                                         <code>docker push {window.location.host}/myimage:latest</code>
-                                        <button
-                                            className="copy-btn"
-                                            onClick={() => copyToClipboard(`docker push ${window.location.host}/myimage:latest`, 'cmd2')}
-                                        >
-                                            {copiedCommand === 'cmd2' ? '✓' : '📋'}
-                                        </button>
+                                        <CopyButton text={`docker push ${window.location.host}/myimage:latest`} className="copy-btn-small" />
                                     </div>
                                 </div>
                             </div>
@@ -272,13 +247,10 @@ function AppContent() {
                                         <div className="repo-actions">
                                             <div className="pull-cmd">
                                                 <code>docker pull {window.location.host}/{repo.name}:{repo.tags[0]}</code>
-                                                <button
+                                                <CopyButton
+                                                    text={`docker pull ${window.location.host}/${repo.name}:${repo.tags[0]}`}
                                                     className="copy-btn-small"
-                                                    onClick={() => copyToClipboard(`docker pull ${window.location.host}/${repo.name}:${repo.tags[0]}`, repo.name)}
-                                                    title="Copy command"
-                                                >
-                                                    {copiedCommand === repo.name ? '✓' : '📋'}
-                                                </button>
+                                                />
                                             </div>
                                         </div>
                                     </div>

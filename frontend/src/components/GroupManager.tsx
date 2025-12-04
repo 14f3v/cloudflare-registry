@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Group, GroupMember } from '../types';
+import { UserAvatar } from './UserAvatar';
 
 export function GroupManager() {
     const { user } = useAuth();
@@ -119,7 +120,7 @@ export function GroupManager() {
         }
     };
 
-    if (loading && !groups.length) return <div className="loading-state">Loading groups...</div>;
+    if (loading && !groups.length) return <div className="loading-state">Loading teams...</div>;
 
     return (
         <div className="group-manager">
@@ -129,99 +130,133 @@ export function GroupManager() {
                     <span className="close-toast">×</span>
                 </div>
             )}
-            <div className="group-sidebar">
-                <div className="sidebar-header">
-                    <h2>My Teams</h2>
-                    <button className="create-btn" onClick={() => setShowCreateModal(true)}>+</button>
+
+            <div className="group-header">
+                <div>
+                    <h1>Teams</h1>
+                    <p className="subtitle">Manage team members and permissions</p>
                 </div>
-                <div className="group-list">
-                    {groups.map(group => (
-                        <div
-                            key={group.id}
-                            className={`group-item ${selectedGroup?.id === group.id ? 'active' : ''}`}
-                            onClick={() => setSelectedGroup(group)}
-                        >
-                            <span className="group-icon">👥</span>
-                            <div className="group-info">
-                                <span className="group-name">{group.name}</span>
-                                <span className="group-role">
-                                    {group.created_by === user?.id ? 'Owner' : 'Member'}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
+                    Create New Team
+                </button>
             </div>
 
-            <div className="group-content">
-                {selectedGroup ? (
-                    <>
-                        <div className="content-header">
-                            <div>
-                                <h1>{selectedGroup.name}</h1>
-                                <p>{selectedGroup.description || 'No description'}</p>
-                            </div>
-                            {selectedGroup.created_by === user?.id && (
-                                <button
-                                    className="delete-btn"
-                                    onClick={() => deleteGroup(selectedGroup.id)}
+            {groups.length === 0 ? (
+                <div className="empty-state">
+                    <div className="empty-icon">👥</div>
+                    <h3>No teams yet</h3>
+                    <p>Create a team to collaborate with others</p>
+                    <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
+                        Create Your First Team
+                    </button>
+                </div>
+            ) : (
+                <div className="group-layout">
+                    <div className="group-sidebar">
+                        <div className="group-list">
+                            {groups.map(group => (
+                                <div
+                                    key={group.id}
+                                    className={`group-item ${selectedGroup?.id === group.id ? 'active' : ''}`}
+                                    onClick={() => setSelectedGroup(group)}
                                 >
-                                    Delete Group
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="members-section">
-                            <h3>Members ({members.length})</h3>
-
-                            <div className="members-list">
-                                {members.map(member => (
-                                    <div key={member.id} className="member-item">
-                                        <div className="member-info">
-                                            <img
-                                                src={member.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.full_name || member.email)}`}
-                                                alt={member.full_name || ''}
-                                                className="member-avatar"
-                                            />
-                                            <div>
-                                                <div className="member-name">{member.full_name || member.email}</div>
-                                                <div className="member-email">{member.email}</div>
-                                            </div>
-                                        </div>
-                                        <div className="member-role">{member.role}</div>
-                                        {selectedGroup.created_by === user?.id && member.user_id !== user?.id && (
-                                            <button
-                                                className="remove-btn"
-                                                onClick={() => removeMember(member.user_id)}
-                                            >
-                                                Remove
-                                            </button>
-                                        )}
+                                    <span className="group-icon">👥</span>
+                                    <div className="group-info">
+                                        <span className="group-name">{group.name}</span>
+                                        <span className="group-role">
+                                            {group.created_by === user?.id ? 'Owner' : 'Member'}
+                                        </span>
                                     </div>
-                                ))}
-                            </div>
-
-                            {selectedGroup.created_by === user?.id && (
-                                <form onSubmit={addMember} className="add-member-form">
-                                    <input
-                                        type="text"
-                                        placeholder="User ID to add..."
-                                        value={newMemberId}
-                                        onChange={e => setNewMemberId(e.target.value)}
-                                        className="input-field"
-                                    />
-                                    <button type="submit" className="action-btn">Add Member</button>
-                                </form>
-                            )}
+                                </div>
+                            ))}
                         </div>
-                    </>
-                ) : (
-                    <div className="empty-selection">
-                        <span className="empty-icon">👈</span>
-                        <p>Select a group to manage members</p>
                     </div>
-                )}
-            </div>
+
+                    <div className="group-content">
+                        {selectedGroup ? (
+                            <>
+                                <div className="content-header">
+                                    <div>
+                                        <h2>{selectedGroup.name}</h2>
+                                        <p className="group-description">{selectedGroup.description || 'No description'}</p>
+                                    </div>
+                                    {selectedGroup.created_by === user?.id && (
+                                        <button
+                                            className="btn-danger-small"
+                                            onClick={() => deleteGroup(selectedGroup.id)}
+                                        >
+                                            Delete Team
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="members-section">
+                                    <h3>Members ({members.length})</h3>
+
+                                    <div className="members-list">
+                                        {members.map(member => (
+                                            <div key={member.id} className="member-item">
+                                                <div className="member-info">
+                                                    <UserAvatar
+                                                        src={member.avatar_url}
+                                                        email={member.email}
+                                                        name={member.full_name}
+                                                        size="medium"
+                                                    />
+                                                    <div className="member-details">
+                                                        <div className="member-name">{member.full_name || member.email}</div>
+                                                        <div className="member-email">{member.email}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="member-actions">
+                                                    <span className="member-role-badge">{member.role}</span>
+                                                    {selectedGroup.created_by === user?.id && member.user_id !== user?.id && (
+                                                        <button
+                                                            className="btn-remove"
+                                                            onClick={() => removeMember(member.user_id)}
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {selectedGroup.created_by === user?.id && (
+                                        <div className="add-member-section">
+                                            <h4>Add Team Member</h4>
+                                            <form onSubmit={addMember} className="add-member-form">
+                                                <div className="form-group">
+                                                    <label htmlFor="member-email">User Email or ID</label>
+                                                    <input
+                                                        id="member-email"
+                                                        type="text"
+                                                        placeholder="user@example.com or user ID"
+                                                        value={newMemberId}
+                                                        onChange={e => setNewMemberId(e.target.value)}
+                                                        className="form-input"
+                                                        required
+                                                    />
+                                                    <p className="form-hint">Enter the email address or user ID to add to this team</p>
+                                                </div>
+                                                <button type="submit" className="btn-primary">
+                                                    Add Member
+                                                </button>
+                                            </form>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="empty-selection">
+                                <span className="empty-icon">👈</span>
+                                <p>Select a team to view members</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {showCreateModal && (
                 <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
@@ -236,7 +271,7 @@ export function GroupManager() {
                                     value={newGroupName}
                                     onChange={e => setNewGroupName(e.target.value)}
                                     required
-                                    className="input-field"
+                                    className="form-input"
                                 />
                             </div>
                             <div className="form-group">
@@ -244,10 +279,11 @@ export function GroupManager() {
                                 <textarea
                                     value={newGroupDesc}
                                     onChange={e => setNewGroupDesc(e.target.value)}
-                                    className="input-field"
+                                    className="form-input"
+                                    rows={3}
                                 />
                             </div>
-                            <button type="submit" className="submit-btn">Create Team</button>
+                            <button type="submit" className="btn-primary">Create Team</button>
                         </form>
                     </div>
                 </div>
