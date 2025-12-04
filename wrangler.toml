@@ -1,0 +1,11 @@
+name = "cloudflare-registry"
+main = "src/index.ts"
+compatibility_date = "2024-11-12"
+
+[r2_buckets]
+binding = "REGISTRY_BUCKET"
+bucket_name = "container-registry-storage"
+preview_bucket_name = "container-registry-storage-preview"
+
+[observability]
+enabled = true
