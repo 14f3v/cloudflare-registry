@@ -51,29 +51,55 @@ export default {
         app.route('/api/repositories', permissions);
         app.route('/api/tokens', tokens);
 
+        // Middleware: Normalize trailing slashes to prevent routing issues
+        // This ensures /v2 and /v2/ are treated the same
+        app.use('*', async (c, next) => {
+            const url = new URL(c.req.url);
+            const path = url.pathname;
+
+            // If path has trailing slash (except root), redirect to non-slash version
+            if (path.length > 1 && path.endsWith('/')) {
+                url.pathname = path.slice(0, -1);
+                return c.redirect(url.toString(), 301);
+            }
+
+            await next();
+        });
+
         // Mount registry routes (Docker API)
         const registry = createRegistry(env);
         app.route('/v2', registry);
 
-        // SPA routing: serve frontend HTML for all non-API, non-registry routes
-        // This allows client-side routing to work on refresh
-        // IMPORTANT: This must come AFTER all API/registry routes
-        app.all('*', (c) => {
-            const path = new URL(c.req.url).pathname
+        // Define known API/backend route prefixes
+        const apiPrefixes = ['/api', '/auth', '/v2'];
 
-            // Don't serve SPA for API, auth, or Docker registry routes
-            if (path.startsWith('/api/') ||
-                path.startsWith('/auth/') ||
-                path.startsWith('/v2/') ||
-                path === '/api' ||
-                path === '/auth' ||
-                path === '/v2') {
-                return c.notFound()
+        // SPA routing: Register explicit frontend routes
+        const frontendRoutes = ['/', '/browse', '/settings'];
+
+        frontendRoutes.forEach(route => {
+            app.get(route, (c) => c.html(frontendHTML));
+        });
+
+        // Catch-all for SPA routes (must be last)
+        app.get('*', (c) => {
+            const path = new URL(c.req.url).pathname;
+
+            // Don't serve SPA for API routes
+            if (apiPrefixes.some(prefix => path.startsWith(prefix))) {
+                return c.notFound();
             }
 
-            // Serve frontend HTML for all other routes (SPA routes)
-            return c.html(frontendHTML)
-        })
+            // Don't serve SPA for files with extensions
+            if (path.match(/\.[a-z0-9]+$/i)) {
+                return c.notFound();
+            }
+
+            // Everything else is an SPA route
+            return c.html(frontendHTML);
+        });
+
+        // Custom 404 handler
+        app.notFound((c) => c.text('Not Found', 404));
 
         return app.fetch(request, env, ctx);
     }
