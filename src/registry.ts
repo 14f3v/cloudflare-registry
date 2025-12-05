@@ -84,7 +84,23 @@ export const createRegistry = (env: Env) => {
         return c.body(null);
     });
 
-    // 3. Pull Blob (requires read permission)
+    // 3. Check if Blob Exists (HEAD - Docker uses this to skip re-uploading existing layers)
+    app.on('HEAD', '/:name/blobs/:digest', authMiddleware(true), requirePermission('read'), async (c: any) => {
+        const { name, digest } = c.req.param();
+        const exists = await storage.hasBlob(name, digest);
+        if (!exists) {
+            return c.notFound();
+        }
+        const blob = await storage.getBlob(name, digest);
+        c.header('Content-Type', 'application/octet-stream');
+        c.header('Docker-Content-Digest', digest);
+        if (blob) {
+            c.header('Content-Length', blob.size.toString());
+        }
+        return c.body(null);
+    });
+
+    // 4. Pull Blob (requires read permission)
     app.get('/:name/blobs/:digest', authMiddleware(true), requirePermission('read'), async (c) => {
         const { name, digest } = c.req.param();
         const blob = await storage.getBlob(name, digest);
