@@ -1501,3 +1501,157 @@ body {
   font-size: 0.75rem;
 }
 
+
+/* Demo Repositories Section */
+.demo-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.demo-section h4 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.demo-hint {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.demo-repos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.demo-repo-card {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.demo-repo-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.demo-repo-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.demo-repo-card h5 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.demo-repo-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  min-height: 2.5em;
+}
+
+.demo-tag {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.demo-actions {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--background);
+  border-radius: 0.75rem;
+  border: 1px dashed var(--border);
+}
+
+.demo-command {
+  font-size: 0.95rem;
+  color: var(--primary);
+  padding: 0.75rem 1.5rem;
+  background: var(--surface);
+  border-radius: 0.5rem;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .demo-repos {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .demo-repo-icon {
+    font-size: 2.5rem;
+  }
+  
+  .demo-section {
+    padding: 1.5rem;
+  }
+}
+
+
+/* GitHub Link */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1rem;
+}
+
+.github-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.github-link:hover {
+  background: var(--background);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.github-link svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .github-link span {
+    display: none;
+  }
+  
+  .github-link {
+    padding: 0.5rem;
+  }
+}
+

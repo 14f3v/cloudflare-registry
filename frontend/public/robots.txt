@@ -1,0 +1,6 @@
+# Cloudflare Registry - SEO Optimization
+
+User-agent: *
+Allow: /
+
+Sitemap: https://cfcr.phimasonelabs.com/sitemap.xml
