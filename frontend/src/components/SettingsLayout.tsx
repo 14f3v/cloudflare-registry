@@ -1,50 +1,71 @@
-import { useState } from 'react';
-import { UserProfile } from './UserProfile';
-import { TokenManager } from './TokenManager';
-import { GroupManager } from './GroupManager';
+import { useState } from 'react'
+import { UserProfile } from './UserProfile'
+import { TokenManager } from './TokenManager'
+import { GroupManager } from './GroupManager'
 
-type SettingsSection = 'profile' | 'tokens' | 'teams';
+type SettingsSection = 'profile' | 'tokens' | 'teams'
 
 export function SettingsLayout() {
-    const [activeSection, setActiveSection] = useState<SettingsSection>('profile');
+    const [activeSection, setActiveSection] = useState<SettingsSection>('profile')
 
     return (
-        <div className="settings-layout">
-            <div className="settings-sidebar">
-                <h2 className="settings-sidebar-title">Settings</h2>
+        <div className="flex gap-8 max-w-7xl mx-auto">
+            {/* Glass Sidebar */}
+            <div className="w-64 flex-shrink-0">
+                <div className="sticky top-24">
+                    {/* Gradient Glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 blur-3xl opacity-30"></div>
 
-                <nav className="settings-nav">
-                    <button
-                        className={`settings-nav-item ${activeSection === 'profile' ? 'active' : ''}`}
-                        onClick={() => setActiveSection('profile')}
-                    >
-                        <span className="settings-nav-icon">👤</span>
-                        Profile
-                    </button>
+                    {/* Glass Panel */}
+                    <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
+                        <h2 className="text-2xl font-bold text-white mb-6 drop-shadow-sm">
+                            ⚙️ Settings
+                        </h2>
 
-                    <button
-                        className={`settings-nav-item ${activeSection === 'tokens' ? 'active' : ''}`}
-                        onClick={() => setActiveSection('tokens')}
-                    >
-                        <span className="settings-nav-icon">🔑</span>
-                        Access Tokens
-                    </button>
+                        <nav className="flex flex-col gap-2">
+                            <button
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${activeSection === 'profile'
+                                        ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg shadow-primary/30'
+                                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    }`}
+                                onClick={() => setActiveSection('profile')}
+                            >
+                                <span className="text-xl">👤</span>
+                                <span className="font-medium">Profile</span>
+                            </button>
 
-                    <button
-                        className={`settings-nav-item ${activeSection === 'teams' ? 'active' : ''}`}
-                        onClick={() => setActiveSection('teams')}
-                    >
-                        <span className="settings-nav-icon">👥</span>
-                        Teams
-                    </button>
-                </nav>
+                            <button
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${activeSection === 'tokens'
+                                        ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg shadow-primary/30'
+                                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    }`}
+                                onClick={() => setActiveSection('tokens')}
+                            >
+                                <span className="text-xl">🔑</span>
+                                <span className="font-medium">Access Tokens</span>
+                            </button>
+
+                            <button
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${activeSection === 'teams'
+                                        ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg shadow-primary/30'
+                                        : 'text-white/70 hover:text-white hover:bg-white/10'
+                                    }`}
+                                onClick={() => setActiveSection('teams')}
+                            >
+                                <span className="text-xl">👥</span>
+                                <span className="font-medium">Teams</span>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
             </div>
 
-            <div className="settings-content">
+            {/* Content Area */}
+            <div className="flex-1 min-w-0">
                 {activeSection === 'profile' && <UserProfile />}
                 {activeSection === 'tokens' && <TokenManager />}
                 {activeSection === 'teams' && <GroupManager />}
             </div>
         </div>
-    );
+    )
 }

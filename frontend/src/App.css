@@ -17,53 +17,33 @@
   --shadow: rgba(0, 0, 0, 0.3);
 }
 
+/* Global Styles */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--background);
+  background-color: var(--background);
   color: var(--text);
-  line-height: 1.6;
+  margin: 0;
+  padding: 0;
 }
 
+#root {
+  min-height: 100vh;
+}
+
+/* App Container */
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--background);
 }
 
-/* Navbar */
-.navbar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-}
-
-.navbar-content {
+/* Main Content */
+.main-content {
+  flex: 1;
   max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.brand-icon {
-  font-size: 2rem;
-}
-
-.navbar-tabs {
-  display: flex;
-  gap: 0.5rem;
+  padding: 2rem;
 }
 
 .nav-tab {
@@ -1769,6 +1749,7 @@ body {
     font-size: 4rem;
   }
 }
+
 /* Modern Hero Section */
 .hero-modern {
   position: relative;
@@ -1824,9 +1805,19 @@ body {
 }
 
 @keyframes float-orb {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
 
 .hero-content {
@@ -1858,8 +1849,17 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.1); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 .hero-main-title {
@@ -2045,24 +2045,24 @@ body {
   .hero-main-title {
     font-size: 2.5rem;
   }
-  
+
   .hero-description {
     font-size: 1rem;
   }
-  
+
   .hero-stats {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .features-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .steps-container {
     grid-template-columns: 1fr;
   }
-  
+
   .quick-start-modern {
     padding: 2rem 1.5rem;
   }
