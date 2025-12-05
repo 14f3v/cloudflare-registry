@@ -56,6 +56,30 @@ export default {
             }
         });
 
+        // API endpoint to delete repositories (requires auth)
+        app.delete('/api/repositories', authMiddleware(true), async (c) => {
+            try {
+                const body = await c.req.json();
+                const { repositories } = body;
+
+                if (!Array.isArray(repositories) || repositories.length === 0) {
+                    return c.json({ error: 'Invalid repositories array' }, 400);
+                }
+
+                const storage = new RegistryStorage(env.REGISTRY_BUCKET);
+
+                // Delete each repository
+                for (const name of repositories) {
+                    await storage.deleteRepository(name);
+                }
+
+                return c.json({ success: true, deleted: repositories.length });
+            } catch (err) {
+                console.error('Error deleting repositories:', err);
+                return c.json({ error: 'Failed to delete repositories' }, 500);
+            }
+        });
+
         // Mount auth routes
         app.route('/auth', auth);
 

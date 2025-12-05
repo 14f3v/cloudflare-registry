@@ -188,4 +188,17 @@ export class RegistryStorage {
             artifacts
         };
     }
+
+    async deleteRepository(name: string) {
+        // Delete all objects under v2/<name>/
+        const prefix = `v2/${name}/`;
+        const listed = await this.bucket.list({ prefix });
+
+        // Delete all manifests and blobs
+        const deletePromises = listed.objects.map(obj =>
+            this.bucket.delete(obj.key)
+        );
+
+        await Promise.all(deletePromises);
+    }
 }

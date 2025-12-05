@@ -4,9 +4,11 @@ import type { Repository } from '../../types'
 
 interface RepositoryListItemProps {
     repository: Repository
+    selected: boolean
+    onToggleSelect: (name: string) => void
 }
 
-export function RepositoryListItem({ repository }: RepositoryListItemProps) {
+export function RepositoryListItem({ repository, selected, onToggleSelect }: RepositoryListItemProps) {
     const registryHost = window.location.host
     const latestTag = repository.tags.filter(t => !t.startsWith('sha256:'))[0] || repository.tags[0]
     const pullCommand = `docker pull ${registryHost}/${repository.name}:${latestTag}`
@@ -16,13 +18,27 @@ export function RepositoryListItem({ repository }: RepositoryListItemProps) {
             to={`/browse/${repository.name}`}
             className="group block"
         >
-            <div className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-white/20 transition-all">
+            <div className={`relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-white/20 transition-all ${selected ? 'ring-2 ring-blue-500/50' : ''}`}>
                 {/* Hover glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity pointer-events-none"></div>
 
                 <div className="relative grid grid-cols-12 gap-4 items-center">
-                    {/* Icon & Name - 4 cols */}
-                    <div className="col-span-4 flex items-center gap-3">
+                    {/* Checkbox - 1 col */}
+                    <div className="col-span-1 flex items-center">
+                        <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={(e) => {
+                                e.stopPropagation()
+                                onToggleSelect(repository.name)
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-4 h-4 rounded border-white/30 bg-white/10 checked:bg-blue-600"
+                        />
+                    </div>
+
+                    {/* Icon & Name - 3 cols */}
+                    <div className="col-span-3 flex items-center gap-3">
                         <div className="text-2xl">📦</div>
                         <div className="min-w-0">
                             <h3 className="text-base font-semibold text-white truncate">{repository.name}</h3>
