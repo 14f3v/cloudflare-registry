@@ -31,8 +31,15 @@ export function RepositoryDetailPage() {
     }, [repository])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 pt-20 pb-12">
-            <div className="container mx-auto px-6 max-w-7xl">
+        <div className="relative min-h-screen overflow-hidden">
+            {/* Animated Background Orbs */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+                <div className="absolute top-20 right-20 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                <div className="absolute top-1/2 right-1/3 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+            </div>
+
+            <div className="relative container mx-auto px-6 max-w-7xl pt-20 pb-12">
                 {/* Header with back button */}
                 <div className="mb-8">
                     <Link
