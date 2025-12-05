@@ -1,11 +1,22 @@
-```typescript
 import { Hono } from 'hono';
 import { createRegistry } from './registry';
 import { RegistryStorage } from './storage';
+import { R2Bucket, D1Database } from '@cloudflare/workers-types';
+import { frontendHTML } from './frontend-html';
 import { auth } from './auth/routes';
 import { groups } from './api/groups';
 import { permissions } from './api/permissions';
 import { tokens } from './api/tokens';
+import { dbMiddleware, authMiddleware } from './auth/middleware';
+
+// Env interface for Cloudflare Workers
+export interface Env {
+    REGISTRY_BUCKET: R2Bucket;
+    DB: D1Database;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GITHUB_CLIENT_ID: string;
+    GITHUB_CLIENT_SECRET: string;
     JWT_SECRET: string;
 }
 
@@ -22,8 +33,7 @@ export default {
         // API endpoint to list repositories (optional auth)
         app.get('/api/repositories', authMiddleware(false), async (c) => {
             try {
-                // List repositories from R2 storage, not database
-                const registry = createRegistry(env);
+                // List repositories from R2 storage where images are actually stored
                 const storage = new RegistryStorage(env.REGISTRY_BUCKET);
                 const repos = await storage.listRepositories();
                 return c.json(repos);
