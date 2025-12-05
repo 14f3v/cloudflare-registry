@@ -146,25 +146,30 @@ export const createRegistry = (env: Env) => {
         return c.body(null);
     });
 
-    // 7. Push Manifest
+    // 7. Upload Manifest
     app.put('/:name/manifests/:reference', async (c) => {
         const { name, reference } = c.req.param();
-        const contentType = c.req.header('content-type') || 'application/json';
-
+        const contentType = c.req.header('content-type') || 'application/vnd.docker.distribution.manifest.v2+json';
         const manifestStr = await c.req.text();
 
         if (!manifestStr) {
-            throw new RegistryError('MANIFEST_INVALID', 'manifest missing', 400);
+            throw new RegistryError('MANIFEST_INVALID', 'manifest body is empty', 400);
         }
 
         const digest = await calculateDigest(manifestStr);
 
+        // Store manifest by the provided reference (tag or digest)
         await storage.putManifest(name, reference, manifestStr, contentType);
 
-        c.status(201);
+        // ALSO store by digest if reference is not already a digest
+        // This allows pulling by digest: docker pull registry/image@sha256:...
+        if (!reference.startsWith('sha256:')) {
+            await storage.putManifest(name, digest, manifestStr, contentType);
+        }
+
         c.header('Location', `/v2/${name}/manifests/${reference}`);
         c.header('Docker-Content-Digest', digest);
-        return c.body(null);
+        return c.body(null, 201);
     });
 
     // 8. Pull Manifest (handles both GET and HEAD)
