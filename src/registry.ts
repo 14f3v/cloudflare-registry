@@ -157,24 +157,30 @@ export const createRegistry = (env: Env) => {
         }
 
         const digest = await calculateDigest(manifestStr);
-        console.log(`[PUT /v2/:name/manifests/:reference] name=${name}, reference=${reference}, digest=${digest}`);
 
         // Store manifest by the provided reference (tag or digest)
         await storage.putManifest(name, reference, manifestStr, contentType);
-        console.log(`[PUT /v2/:name/manifests/:reference] Stored by reference: ${reference}`);
+
+        // Debug: track what we're doing
+        let debugInfo = `ref=${reference}`;
 
         // ALSO store by digest if reference is not already a digest
         // This allows pulling by digest: docker pull registry/image@sha256:...
         if (!reference.startsWith('sha256:')) {
-            console.log(`[PUT /v2/:name/manifests/:reference] Also storing by digest: ${digest}`);
-            await storage.putManifest(name, digest, manifestStr, contentType);
-            console.log(`[PUT /v2/:name/manifests/:reference] Successfully stored by digest: ${digest}`);
+            debugInfo += `,also-by-digest=${digest}`;
+            try {
+                await storage.putManifest(name, digest, manifestStr, contentType);
+                debugInfo += `,digest-stored=true`;
+            } catch (err) {
+                debugInfo += `,digest-stored=false,error=${err instanceof Error ? err.message : 'unknown'}`;
+            }
         } else {
-            console.log(`[PUT /v2/:name/manifests/:reference] Reference is already a digest, skipping duplicate storage`);
+            debugInfo += `,already-digest=true`;
         }
 
         c.header('Location', `/v2/${name}/manifests/${reference}`);
         c.header('Docker-Content-Digest', digest);
+        c.header('X-Debug-Manifest-Storage', debugInfo); // Debug header
         return c.body(null, 201);
     });
 
